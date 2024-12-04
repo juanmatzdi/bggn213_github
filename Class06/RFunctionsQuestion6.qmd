@@ -1,0 +1,64 @@
+---
+title: "R Functions: Question 6"
+author: "Juan Manuel (PID: A69034758)"
+format: pdf
+---
+```{r}
+# Can you improve this analysis code?
+library(bio3d)
+
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s3, chain="A", elety="CA")
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+
+Exploring the data frame structure... 
+
+```{r}
+s1 <- read.pdb("4AKE")
+```
+
+```{r}
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s1.chainA
+```
+
+```{r}
+s1.b <- s1.chainA$atom$b
+s1.b
+```
+
+By exploring the type of functions and data from the above code, we can see that they run the functions three times. To simplify this code, we will need to define a function that iterates through the three PBD strcutures. 
+For this, we first need to built a vector that contains all the PBD IDs. 
+```{r}
+library(bio3d)
+pdb_ids <- c("4AKE", "1AKE", "1E4Y") #kinase with drug 4AKE, #kinase no drug 1AKE, kinase with drug 1E4Y
+```
+
+After this, we need to built a function that integrates the four main functions in the original code. That is: reading the data, trimming the data, extracts the B-factors for the alpha carbon atoms in chain A of the PDB file, and plot them. 
+
+```{r}
+B_factors_plots <- function(pdb_indivual_id) {
+  pdb_data <- read.pdb(pdb_indivual_id) #reading data
+  chain_data <- trim.pdb(pdb_data, chain = "A", elety = "CA") #triming data
+  b_factors <- chain_data$atom$b #getting b factors
+  plotb3(b_factors, sse=chain_data, typ="l", ylab="B-factor", main=pdb_indivual_id) #plotting data
+}
+```
+As we need to iterate this function to every single item from pdb_ids, we are gonna be using the function sapply(). 
+```{r}
+final_plots <- sapply(pdb_ids, B_factors_plots) #using the function in the pdb_ids list. 
+```
+
+And then we obtained the same output as the original code but optimized. 
+
+

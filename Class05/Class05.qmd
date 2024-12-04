@@ -1,0 +1,160 @@
+---
+title: "Class 5: Data Viz with ggplot"
+author: "Juan Manuel (PID: A69034758)"
+format: pdf
+---
+R has a lot of ways to make figures and graphs. In particular, one that comes with R out of the box is called **"base" R** - the `plot()` function. 
+```{r}
+plot(cars)
+```
+
+A very popular package is called **ggplot2**
+
+Before I can use any add-on package like this one I must install it. We can use the `install.packages("ggplot2")` command. Install the add-on on the console. 
+
+Before using, I need to call it with `library()`
+
+
+```{r}
+library(ggplot2)
+ggplot(cars) +
+  aes(x=speed, y=dist) +
+  geom_point() +
+  geom_smooth()
+```
+
+Remember that ggplot works in layers. You need to add them in order to get the data displayed. Every ggplot has at least 3 layers: 
+
+- **data** (the number or stuff you want to plot --usually a data frame `data.frame`--)
+- **aes**thetics (mapping of your columns in the data frame to your plot --position x,y; size, line type, line width, color, shape)
+- **geom**s (there are tones of these; basics are `geom_point()`, `geom_line()`, `geom_col()`)
+
+```{r}
+mtcars
+```
+
+Make a ggplot of `mtcars` data set using `mpg` vs `disp`. Set the size of the points to the `hp`. Also, set the color to `am`. 
+```{r}
+ggplot(mtcars) +
+  aes(x=mpg, y=disp, size=hp, color=am) +
+  geom_point()
+```
+
+```{r}
+ggplot(mtcars) +
+  aes(x=mpg, y=disp, size=hp) +
+  geom_point(col="blue")
+```
+
+You can plot subgraph with the facet layer
+```{r}
+ggplot(mtcars) +
+  aes(x=mpg, y=disp, size=hp, col=am) +
+  geom_point() +
+  facet_wrap(~am)
+```
+
+How can we identify what data is each point? But we need to install ggrepel
+```{r}
+rownames(mtcars)
+library(ggrepel)
+ggplot(mtcars) +
+  aes(x=mpg, y=disp, col=am, label=rownames(mtcars)) +
+  geom_point() +
+  facet_wrap(~am) +
+  geom_text_repel()
+```
+
+Now section 7. Going further. 
+```{r}
+library(gapminder)
+url <- "https://raw.githubusercontent.com/jennybc/gapminder/master/inst/extdata/gapminder.tsv"
+
+gapminder <- read.delim(url)
+```
+```{r}
+library(dplyr)
+
+gapminder_2007 <- gapminder %>% filter(year==2007)
+
+ggplot(gapminder_2007) +
+  aes(x=gdpPercap, y=lifeExp) +
+  geom_point(alpha=0.5)
+```
+
+Now we are adding more variables to the aesthetic leyer: 
+
+```{r}
+gapminder_2007 <- gapminder %>% filter(year==2007)
+
+ggplot(gapminder_2007) +
+  aes(x=gdpPercap, y=lifeExp, color=continent, size=pop) +
+  geom_point(alpha=0.5)
+```
+
+Coloring by population 
+```{r}
+ggplot(gapminder_2007) +
+  aes(x=gdpPercap, y=lifeExp, color=pop) +
+  geom_point(alpha=0.5)
+```
+
+Another way to write this code: 
+```{r}
+ggplot(gapminder_2007) + 
+  geom_point(aes(x = gdpPercap, y = lifeExp,
+                 size = pop), alpha=0.5) + 
+  scale_size_area(max_size = 10)
+```
+
+NOW LETS GO BACK TO THE 6TH PART...
+```{r}
+url <- "https://bioboot.github.io/bimm143_S20/class-material/up_down_expression.txt"
+genes <- read.delim(url)
+head(genes)
+```
+There are `n nrows(genes)` genes in this data set.  
+Functions such as `nrows()`, `ncol()`, and `table()` are useful and important. 
+```{r}
+nrow(genes)
+```
+```{r}
+unique(genes$State)
+```
+
+Now we need to compare the two conditions 
+
+```{r}
+ggplot(genes) + 
+  aes(x = Condition1, y=Condition2) + 
+  geom_point()
+```
+
+With colors and saving it as a vector
+```{r}
+p <- ggplot(genes) + 
+  aes(x = Condition1, y=Condition2, col = State) + 
+  geom_point()
+p
+```
+Then, we wanna change the colors to common used ones in gene expression profiling. 
+```{r}
+p + scale_colour_manual( values=c("blue","gray","red") )
+```
+
+If we want to add labels, we can use the function labs(). For this, let define x as control treatment and y as drug treatment.
+```{r}
+p + scale_colour_manual( values=c("blue","gray","red") ) +
+  labs(title="Gene Expresion Changes Upon Drug Treatment",
+         x="Control (no drug) ",
+         y="Drug Treatment")
+```
+
+
+> Key points from the lesson: 
+Saving plots with **ggsave()**
+Different plot "types" with different `geoms_**()`
+Faceting with `facet_wrap()`
+Multi-plot layout with the **patchwork** package. 
+
+
