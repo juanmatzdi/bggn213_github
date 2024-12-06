@@ -1,7 +1,7 @@
 ---
 title: "Class06: Functions"
 author: "Juan Manuel (PID: A69034758)"
-format: pdf
+format: gfm
 ---
 
 The first function we write
